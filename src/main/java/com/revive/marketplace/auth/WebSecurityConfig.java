@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,25 +37,16 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-              .csrf(csrf -> csrf.disable()) // Disable CSRF for API-based authentication
+              .csrf(csrf -> csrf.disable()) // 🔥 Deshabilitar CSRF para APIs
+              .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 🔥 API sin sesiones
               .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/", "/api/users/login", "/api/users/register").permitAll()
                     .requestMatchers("/api/users/**").hasAuthority("ROLE_ADMIN")
-                    .requestMatchers("/api/products/**", "/api/orders/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                    .requestMatchers("/api/products/**", "/api/orders/**").hasAnyAuthority("ADMIN", "USER")
                     .anyRequest().authenticated()
               )
-              .formLogin(login -> login
-                    .loginProcessingUrl("/api/users/login")  // Ruta donde se procesa el login
-                    .usernameParameter("email")
-                    .defaultSuccessUrl("/dashboard", true)  // Redirigir al dashboard en lugar de a /api/users/login
-                    .failureUrl("/api/users/login?error=true")
-                    .permitAll()
-              )
-              .sessionManagement(session -> session
-                    .sessionFixation().newSession()
-                    .maximumSessions(1)
-                    .expiredUrl("/api/users/login?expired=true")
-              )
+              .httpBasic(httpBasic -> {})
+              .formLogin(form -> form.disable())
               .logout(logout -> logout
                     .logoutUrl("/logout")
                     .logoutSuccessUrl("/api/users/login?logout")
