@@ -4,14 +4,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.Optional;
+
+import com.revive.marketplace.user.User;
+import com.revive.marketplace.user.UserRepository;
+
 
 
 @Service
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final userRepository userRepository;
+    private final UserRepository userRepository;
 
     @Autowired
     public ProductService(ProductRepository productRepository, UserRepository userRepository) {
@@ -86,7 +89,7 @@ public class ProductService {
         product = productRepository.save(product);
         return new ProductDTO(product.getId(), product.getTitle(), product.getDescription(),
                 product.getPrice(), product.getImage(), product.getCategory(), product.getStatus(),
-                product.isLiked(), product.getCreatedAt(), product.getUserId().getId());
+                product.isLiked(), product.getCreatedAt(), product.getUser().getId());
     }
 
   

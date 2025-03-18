@@ -2,6 +2,8 @@ package com.revive.marketplace.product;
 
 import java.time.LocalDateTime;
 
+import com.revive.marketplace.user.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,6 +11,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
@@ -45,30 +49,29 @@ public class ProductModel {
 
     @Column(nullable = false)
     private boolean liked;
-    /*
-     * @ManyToOne(optional = false)
-     * 
-     * @JoinColumn(name = "user_id", nullable = false)
-     * private User user;
-     */
+
+    @ManyToOne(optional = false)
+
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     public ProductModel() {
         this.createdAt = LocalDateTime.now();
     }
 
     public ProductModel(Long id, String title, String description, BigDecimal price, String image,
-            ProductCategory category,
-            ProductStatus status, boolean liked) {
+            ProductCategory category, ProductStatus status, boolean liked,
+            LocalDateTime createdAt, User user) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.price = price;
         this.image = image;
-        this.createdAt = LocalDateTime.now();
         this.category = category;
         this.status = status;
         this.liked = liked;
-        // this.user = user;
+        this.createdAt = createdAt;
+        this.user = user;
     }
 
     public Long getId() {
@@ -138,15 +141,13 @@ public class ProductModel {
     public void setLiked(boolean liked) {
         this.liked = liked;
     }
-    /*
-     * public User getUser() {
-     * return user;
-     * }
-     * 
-     * public void setUser(User user) {
-     * this.user = user;
-     * }
-     */
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
 }
-
