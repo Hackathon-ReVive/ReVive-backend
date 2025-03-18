@@ -2,15 +2,36 @@ package com.revive.marketplace.product;
 
 import java.math.BigDecimal;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.*;
+
 public class ProductRequestDTO {
+    @NotBlank(message = "Title is required")
     private String title;
+
+    @NotBlank(message = "Description is required")
     private String description;
+
+    @NotNull(message = "Price is required")
+    @Positive(message = "Price must be greater than zero")
     private BigDecimal price;
+
+    @NotBlank(message = "Image URL is required")
     private String image;
+
+    @NotNull(message = "Category is required")
     private ProductCategory category;
+
+    @NotNull(message = "Status is required")
     private ProductStatus status;
+
     private boolean liked;
+
+    @NotNull(message = "User ID is required")
     private Long userId;
+
+
 
     public ProductRequestDTO() {}
 
