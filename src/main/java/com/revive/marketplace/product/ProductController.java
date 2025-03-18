@@ -1,32 +1,33 @@
 package com.revive.marketplace.product;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/products")
 public class ProductController {
 
     private final ProductService productService;
-
-    @Autowired
+   
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
 
-    // Crear un producto
+    // Crear un producto con validación
     @PostMapping
-    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductRequestDTO requestDTO) {
+    public ResponseEntity<ProductDTO> createProduct(@RequestBody @Valid ProductRequestDTO requestDTO) {
         ProductDTO product = productService.createProduct(requestDTO);
         return ResponseEntity.ok(product);
     }
 
-    // Obtener un producto por ID
+    // Obtener un producto por ID con validación
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable @NotNull Long id) {
         ProductDTO product = productService.getProductById(id);
         return ResponseEntity.ok(product);
     }
@@ -38,33 +39,32 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    // Obtener productos por categoría
+    // Obtener productos por categoría con validación
     @GetMapping("/category/{category}")
-    public ResponseEntity<List<ProductDTO>> getProductsByCategory(@PathVariable ProductCategory category) {
+    public ResponseEntity<List<ProductDTO>> getProductsByCategory(@PathVariable @NotNull ProductCategory category) {
         List<ProductDTO> products = productService.getProductsByCategory(category);
         return ResponseEntity.ok(products);
     }
 
-    // Obtener productos por estado
+    // Obtener productos por estado con validación
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<ProductDTO>> getProductsByStatus(@PathVariable ProductStatus status) {
+    public ResponseEntity<List<ProductDTO>> getProductsByStatus(@PathVariable @NotNull ProductStatus status) {
         List<ProductDTO> products = productService.getProductsByStatus(status);
         return ResponseEntity.ok(products);
     }
 
-    // Actualizar un producto
+    // Actualizar un producto con validación
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @RequestBody ProductRequestDTO requestDTO) {
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable @NotNull Long id,
+                                                     @RequestBody @Valid ProductRequestDTO requestDTO) {
         ProductDTO updatedProduct = productService.updateProduct(id, requestDTO);
         return ResponseEntity.ok(updatedProduct);
     }
 
-    // Eliminar un producto
+    // Eliminar un producto con validación
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteProduct(@PathVariable @NotNull Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
 }
-
-
