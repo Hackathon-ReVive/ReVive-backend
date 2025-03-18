@@ -2,78 +2,70 @@ package com.revive.marketplace.product;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
+import org.springframework.validation.annotation.Validated;
+
 
 @Service
+@Validated
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final userRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
+    // ✅ Inyección de dependencias SIN @Autowired
     public ProductService(ProductRepository productRepository, UserRepository userRepository) {
         this.productRepository = productRepository;
         this.userRepository = userRepository;
     }
 
-
-    public ProductDTO createProduct(ProductRequestDTO requestDTO) {
+    public ProductDTO createProduct(@Valid @NotNull ProductRequestDTO requestDTO) {
         User user = userRepository.findById(requestDTO.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         ProductModel product = new ProductModel(
-                null, requestDTO.getTitle(), requestDTO.getDescription(), requestDTO.getPrice(),
+                requestDTO.getTitle(), requestDTO.getDescription(), requestDTO.getPrice(),
                 requestDTO.getImage(), requestDTO.getCategory(), requestDTO.getStatus(),
-                requestDTO.isLiked(), java.time.LocalDateTime.now(), user);
+                requestDTO.isLiked(), user
+        );
         product = productRepository.save(product);
-        return new ProductDTO(product.getId(), product.getTitle(), product.getDescription(),
-                product.getPrice(), product.getImage(), product.getCategory(), product.getStatus(),
-                product.isLiked(), product.getCreatedAt(), product.getUser().getId());
+        return mapToDTO(product);
     }
 
- 
-    public ProductDTO getProductById(Long id) {
+    public ProductDTO getProductById(@NotNull Long id) {
         ProductModel product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-        return new ProductDTO(product.getId(), product.getTitle(), product.getDescription(),
-                product.getPrice(), product.getImage(), product.getCategory(), product.getStatus(),
-                product.isLiked(), product.getCreatedAt(), product.getUser().getId());
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        return mapToDTO(product);
     }
-
 
     public List<ProductDTO> getAllProducts() {
         return productRepository.findAll().stream()
-                .map(product -> new ProductDTO(product.getId(), product.getTitle(), product.getDescription(),
-                        product.getPrice(), product.getImage(), product.getCategory(), product.getStatus(),
-                        product.isLiked(), product.getCreatedAt(), product.getUser().getId()))
+                .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
 
- 
-    public List<ProductDTO> getProductsByCategory(ProductCategory category) {
+    public List<ProductDTO> getProductsByCategory(@NotNull ProductCategory category) {
         return productRepository.findByCategory(category).stream()
-                .map(product -> new ProductDTO(product.getId(), product.getTitle(), product.getDescription(),
-                        product.getPrice(), product.getImage(), product.getCategory(), product.getStatus(),
-                        product.isLiked(), product.getCreatedAt(), product.getUser().getId()))
+                .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
 
-
-    public List<ProductDTO> getProductsByStatus(ProductStatus status) {
+    public List<ProductDTO> getProductsByStatus(@NotNull ProductStatus status) {
         return productRepository.findByStatus(status).stream()
-                .map(product -> new ProductDTO(product.getId(), product.getTitle(), product.getDescription(),
-                        product.getPrice(), product.getImage(), product.getCategory(), product.getStatus(),
-                        product.isLiked(), product.getCreatedAt(), product.getUser().getId()))
+                .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
 
-   
-    public ProductDTO updateProduct(Long id, ProductRequestDTO requestDTO) {
+    public ProductDTO updateProduct(@NotNull Long id, @Valid @NotNull ProductRequestDTO requestDTO) {
         ProductModel product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
         product.setTitle(requestDTO.getTitle());
         product.setDescription(requestDTO.getDescription());
@@ -84,16 +76,21 @@ public class ProductService {
         product.setLiked(requestDTO.isLiked());
 
         product = productRepository.save(product);
-        return new ProductDTO(product.getId(), product.getTitle(), product.getDescription(),
-                product.getPrice(), product.getImage(), product.getCategory(), product.getStatus(),
-                product.isLiked(), product.getCreatedAt(), product.getUserId().getId());
+        return mapToDTO(product);
     }
 
-  
-    public void deleteProduct(Long id) {
+    public void deleteProduct(@NotNull Long id) {
         if (!productRepository.existsById(id)) {
-            throw new RuntimeException("Product not found");
+            throw new IllegalArgumentException("Product not found");
         }
         productRepository.deleteById(id);
+    }
+
+    private ProductDTO mapToDTO(ProductModel product) {
+        return new ProductDTO(
+                product.getId(), product.getTitle(), product.getDescription(),
+                product.getPrice(), product.getImage(), product.getCategory(), product.getStatus(),
+                product.isLiked(), product.getCreatedAt(), product.getUser().getId()
+        );
     }
 }
