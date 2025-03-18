@@ -13,6 +13,11 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
     }
     
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+    
+    
     public void saveUser(User user) {
         userRepository.save(user);  // Guarda el usuario en la base de datos
     }

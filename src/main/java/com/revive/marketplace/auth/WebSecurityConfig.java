@@ -3,19 +3,20 @@ package com.revive.marketplace.auth;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 public class WebSecurityConfig {
     
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public UserDetailsService userDetailsService() {
+        return new CustomUserDetailsService();
     }
     
     @Bean
@@ -24,29 +25,41 @@ public class WebSecurityConfig {
     }
     
     @Bean
+    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+        
+        return new ProviderManager(authProvider);
+    }
+    
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-              .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                    .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/images/**", "/error").permitAll()  // Acceso público
-                    .requestMatchers("/api/auth/**").permitAll() // Acceso público a la autenticación
-                    .requestMatchers("/api/users/**").hasAuthority("ROLE_ADMIN") // Solo ADMIN puede acceder a '/api/users'
-                    .requestMatchers("/api/products/**", "/api/orders/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER") // ADMIN y USER pueden acceder a productos y órdenes
-                    .anyRequest().authenticated()  // El resto de las rutas requieren autenticación
+              .csrf(csrf -> csrf.disable()) // Disable CSRF for API-based authentication
+              .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/", "/api/users/login", "/api/users/register").permitAll()
+                    .requestMatchers("/api/users/**").hasAuthority("ROLE_ADMIN")
+                    .requestMatchers("/api/products/**", "/api/orders/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                    .anyRequest().authenticated()
               )
-              .formLogin(formLogin -> formLogin
-                    .loginPage("/login") // Ruta para la página de login personalizada
-                    .loginProcessingUrl("/process-login") // URL de procesamiento de login
-                    .defaultSuccessUrl("/dashboard", true) // Redirige a dashboard después de login exitoso
-                    .failureUrl("/login?error=true") // Redirige a login si la autenticación falla
-                    .permitAll() // Asegura que el login sea accesible públicamente
+              .formLogin(login -> login
+                    .loginProcessingUrl("/api/users/login")  // Ruta donde se procesa el login
+                    .usernameParameter("email")
+                    .defaultSuccessUrl("/dashboard", true)  // Redirigir al dashboard en lugar de a /api/users/login
+                    .failureUrl("/api/users/login?error=true")
+                    .permitAll()
+              )
+              .sessionManagement(session -> session
+                    .sessionFixation().newSession()
+                    .maximumSessions(1)
+                    .expiredUrl("/api/users/login?expired=true")
               )
               .logout(logout -> logout
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout")) // URL para el logout
-                    .logoutSuccessUrl("/login?logout") // Redirige a login después de logout
-                    .permitAll() // Asegura que el logout sea accesible públicamente
-              )
-              .cors(cors -> cors.disable()) // Deshabilita CORS (si no lo necesitas)
-              .csrf(csrf -> csrf.disable()); // Deshabilita CSRF (si estás trabajando solo con API REST)
+                    .logoutUrl("/logout")
+                    .logoutSuccessUrl("/api/users/login?logout")
+                    .permitAll()
+              );
         
         return http.build();
     }
