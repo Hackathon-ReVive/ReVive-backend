@@ -27,28 +27,26 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
               .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                    .requestMatchers("/", "/login", "/register", "/css/**", "/js/**",
-                          "/images/**", "/error").permitAll()  // Permite rutas públicas
-                    .requestMatchers("/api/auth/**").permitAll() // Acceso público a autenticación
-                    .requestMatchers("/api/users/**").hasAuthority("ROLE_ADMIN") // Solo ADMIN puede acceder
-                    .requestMatchers("/api/products/**", "/api/orders/**").hasAnyAuthority(
-                          "ROLE_ADMIN", "ROLE_USER") // ADMIN y USER pueden acceder
-                    .anyRequest().authenticated()  // El resto de las rutas requiere autenticación
+                    .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/images/**", "/error").permitAll()  // Acceso público
+                    .requestMatchers("/api/auth/**").permitAll() // Acceso público a la autenticación
+                    .requestMatchers("/api/users/**").hasAuthority("ROLE_ADMIN") // Solo ADMIN puede acceder a '/api/users'
+                    .requestMatchers("/api/products/**", "/api/orders/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER") // ADMIN y USER pueden acceder a productos y órdenes
+                    .anyRequest().authenticated()  // El resto de las rutas requieren autenticación
               )
               .formLogin(formLogin -> formLogin
-                    .loginPage("/login")
-                    .loginProcessingUrl("/process-login")
-                    .defaultSuccessUrl("/dashboard", true)
-                    .failureUrl("/login?error=true")
-                    .permitAll()
+                    .loginPage("/login") // Ruta para la página de login personalizada
+                    .loginProcessingUrl("/process-login") // URL de procesamiento de login
+                    .defaultSuccessUrl("/dashboard", true) // Redirige a dashboard después de login exitoso
+                    .failureUrl("/login?error=true") // Redirige a login si la autenticación falla
+                    .permitAll() // Asegura que el login sea accesible públicamente
               )
               .logout(logout -> logout
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                    .logoutSuccessUrl("/login?logout")
-                    .permitAll()
+                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout")) // URL para el logout
+                    .logoutSuccessUrl("/login?logout") // Redirige a login después de logout
+                    .permitAll() // Asegura que el logout sea accesible públicamente
               )
-              .cors(cors -> cors.disable())
-              .csrf(csrf -> csrf.disable());
+              .cors(cors -> cors.disable()) // Deshabilita CORS (si no lo necesitas)
+              .csrf(csrf -> csrf.disable()); // Deshabilita CSRF (si estás trabajando solo con API REST)
         
         return http.build();
     }

@@ -10,10 +10,10 @@ public class UserService {
     private UserRepository userRepository;
     
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
     }
     
     public void saveUser(User user) {
-        userRepository.save(user);
+        userRepository.save(user);  // Guarda el usuario en la base de datos
     }
 }
