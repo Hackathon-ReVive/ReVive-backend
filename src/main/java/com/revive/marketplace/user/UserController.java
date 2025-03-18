@@ -30,7 +30,8 @@ public class UserController {
         
         userService.saveUser(user);
         
-        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole().toString());
+        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(),
+              user.getPhonenumber(),user.getAddress(), user.getRole().toString());
     }
     
     // Endpoint para login de usuario
@@ -42,13 +43,15 @@ public class UserController {
         
         User user = userService.getUserByEmail(loginRequest.getEmail());
         
-        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole().toString());
+        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(),
+              user.getPhonenumber(),user.getAddress(), user.getRole().toString());
     }
     
     // Endpoint para obtener el usuario por ID
     @GetMapping("/{id}")
     public UserDTO getUser(@PathVariable Long id) {
         User user = userService.getUserById(id);
-        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole().toString());
+        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(),
+              user.getPhonenumber(),user.getAddress(), user.getRole().toString());
     }
 }

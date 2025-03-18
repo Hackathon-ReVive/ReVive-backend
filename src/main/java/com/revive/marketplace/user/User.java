@@ -12,6 +12,8 @@ public class User {
     private String username;
     private String password;
     private String email;
+    private String phonenumber;
+    private String address;
     
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -47,6 +49,22 @@ public class User {
     
     public void setEmail(String email) {
         this.email = email;
+    }
+    
+    public String getPhonenumber() {
+        return phonenumber;
+    }
+    
+    public void setPhonenumber(String phonenumber) {
+        this.phonenumber = phonenumber;
+    }
+    
+    public String getAddress() {
+        return address;
+    }
+    
+    public void setAddress(String address) {
+        this.address = address;
     }
     
     public Role getRole() {
