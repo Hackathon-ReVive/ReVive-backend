@@ -6,12 +6,15 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-import java.util.Optional;
+
 
 import org.springframework.validation.annotation.Validated;
+
+import com.revive.marketplace.user.User;
+import com.revive.marketplace.user.UserRepository;
 
 
 @Service
@@ -27,7 +30,7 @@ public class ProductService {
         this.userRepository = userRepository;
     }
 
-public ProductDTO createProduct(@Valid @NotNull ProductRequestDTO requestDTO) {
+public ProductDto createProduct(@Valid @NotNull ProductRequestDTO requestDTO) {
     User user = userRepository.findById(requestDTO.getUserId())
             .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -41,37 +44,37 @@ public ProductDTO createProduct(@Valid @NotNull ProductRequestDTO requestDTO) {
     return mapToDTO(product);
 }
 
-    public ProductDTO getProductById(@NotNull Long id) {
+    public ProductDto getProductById(@NotNull Long id) {
         ProductModel product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
         return mapToDTO(product);
     }
 
-    public List<ProductDTO> getAllProducts() {
+    public List<ProductDto> getAllProducts() {
         return productRepository.findAll().stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<ProductDTO> getProductsByCategory(@NotNull ProductCategory category) {
+    public List<ProductDto> getProductsByCategory(@NotNull ProductCategory category) {
         return productRepository.findByCategory(category).stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<ProductDTO> getProductsByStatus(@NotNull ProductStatus status) {
+    public List<ProductDto> getProductsByStatus(@NotNull ProductStatus status) {
         return productRepository.findByStatus(status).stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
 
-    public ProductDTO updateProduct(@NotNull Long id, @Valid @NotNull ProductRequestDTO requestDTO, String userEmail) {
+    public ProductDto updateProduct(@NotNull Long id, @Valid @NotNull ProductRequestDTO requestDTO, String userEmail) {
         // Buscar el producto en la base de datos
         ProductModel product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
     
         // Buscar el usuario que está haciendo la solicitud
-        User user = userRepository.findByEmail(userEmail)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     
         // Validar que el usuario autenticado es el dueño del producto
@@ -100,8 +103,8 @@ public ProductDTO createProduct(@Valid @NotNull ProductRequestDTO requestDTO) {
         productRepository.deleteById(id);
     }
 
-    private ProductDTO mapToDTO(ProductModel product) {
-        return new ProductDTO(
+    private ProductDto mapToDTO(ProductModel product) {
+        return new ProductDto(
                 product.getId(), product.getTitle(), product.getDescription(),
                 product.getPrice(), product.getImage(), product.getCategory(), product.getStatus(),
                 product.isLiked(), product.getCreatedAt(), product.getUser().getId()

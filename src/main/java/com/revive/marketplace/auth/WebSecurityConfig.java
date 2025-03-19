@@ -30,7 +30,8 @@ public class WebSecurityConfig {
                     .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/images/**", "/error").permitAll()  // Acceso público
                     .requestMatchers("/api/auth/**").permitAll() // Acceso público a la autenticación
                     .requestMatchers("/api/users/**").hasAuthority("ROLE_ADMIN") // Solo ADMIN puede acceder a '/api/users'
-                    .requestMatchers("/api/products/**", "/api/orders/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER") // ADMIN y USER pueden acceder a productos y órdenes
+                    .requestMatchers("/api/products/**").permitAll()
+
                     .anyRequest().authenticated()  // El resto de las rutas requieren autenticación
               )
               .formLogin(formLogin -> formLogin

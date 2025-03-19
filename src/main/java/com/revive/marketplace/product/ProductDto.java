@@ -3,7 +3,7 @@ package com.revive.marketplace.product;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class ProductDTO {
+public class ProductDto {
     private Long id;
     private String title;
     private String description;
@@ -15,7 +15,7 @@ public class ProductDTO {
     private LocalDateTime createdAt;
     private long userId;
 
-    public ProductDTO(Long id, String title, String description, BigDecimal price, String image,
+    public ProductDto(Long id, String title, String description, BigDecimal price, String image,
             ProductCategory category, ProductStatus status, boolean liked, LocalDateTime createdAt, Long userId) {
         this.id = id;
         this.title = title;
@@ -23,7 +23,7 @@ public class ProductDTO {
         this.price = price;
         this.image = image;
         this.category = category;
-        this.status = status;
+        // this.status = status;
         this.liked = liked;
         this.createdAt = createdAt;
         this.userId = userId;

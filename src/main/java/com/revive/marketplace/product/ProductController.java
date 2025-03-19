@@ -23,46 +23,46 @@ public class ProductController {
 
     // ✅ Crear un producto (Solo usuarios autenticados)
     @PostMapping
-    public ResponseEntity<ProductDTO> createProduct(@RequestBody @Valid ProductRequestDTO requestDTO) {
-        ProductDTO product = productService.createProduct(requestDTO);
+    public ResponseEntity<ProductDto> createProduct(@RequestBody @Valid ProductRequestDTO requestDTO) {
+        ProductDto product = productService.createProduct(requestDTO);
         return ResponseEntity.ok(product);
     }
 
     // ✅ Obtener un producto por ID
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> getProductById(@PathVariable @NotNull Long id) {
-        ProductDTO product = productService.getProductById(id);
+    public ResponseEntity<ProductDto> getProductById(@PathVariable @NotNull Long id) {
+        ProductDto product = productService.getProductById(id);
         return ResponseEntity.ok(product);
     }
 
     // ✅ Obtener todos los productos
     @GetMapping
-    public ResponseEntity<List<ProductDTO>> getAllProducts() {
-        List<ProductDTO> products = productService.getAllProducts();
+    public ResponseEntity<List<ProductDto>> getAllProducts() {
+        List<ProductDto> products = productService.getAllProducts();
         return ResponseEntity.ok(products);
     }
 
     // ✅ Obtener productos por categoría
     @GetMapping("/category/{category}")
-    public ResponseEntity<List<ProductDTO>> getProductsByCategory(@PathVariable @NotNull ProductCategory category) {
-        List<ProductDTO> products = productService.getProductsByCategory(category);
+    public ResponseEntity<List<ProductDto>> getProductsByCategory(@PathVariable @NotNull ProductCategory category) {
+        List<ProductDto> products = productService.getProductsByCategory(category);
         return ResponseEntity.ok(products);
     }
 
     // ✅ Obtener productos por estado
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<ProductDTO>> getProductsByStatus(@PathVariable @NotNull ProductStatus status) {
-        List<ProductDTO> products = productService.getProductsByStatus(status);
+    public ResponseEntity<List<ProductDto>> getProductsByStatus(@PathVariable @NotNull ProductStatus status) {
+        List<ProductDto> products = productService.getProductsByStatus(status);
         return ResponseEntity.ok(products);
     }
 
     // ✅ Actualizar un producto (Solo el dueño del producto puede hacerlo)
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable @NotNull Long id,
+    public ResponseEntity<ProductDto> updateProduct(@PathVariable @NotNull Long id,
             @RequestBody @Valid ProductRequestDTO requestDTO,
             @AuthenticationPrincipal UserDetails userDetails) {
         String userEmail = userDetails.getUsername(); // Obtener email del usuario autenticado
-        ProductDTO updatedProduct = productService.updateProduct(id, requestDTO, userEmail);
+        ProductDto updatedProduct = productService.updateProduct(id, requestDTO, userEmail);
         return ResponseEntity.ok(updatedProduct);
     }
 
