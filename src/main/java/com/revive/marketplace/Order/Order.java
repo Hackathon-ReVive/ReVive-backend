@@ -1,72 +1,89 @@
 package com.revive.marketplace.Order;
-
-import java.time.LocalDateTime;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.revive.marketplace.product.ProductModel;
+import com.revive.marketplace.user.User;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 @Entity
+@Table(name = "orders")
 public class Order {
-@Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)
-private Long id;
-
-@Column(name = "date_order", nullable = false, length = 50)
-LocalDateTime dateOrder;
-
-
-//@ManyToOne(fetch = FetchType.LAZY)
-@JoinColumn(name = "id_user")
-//@JsonBackReference
-//User user;
-
-@ManyToOne(fetch = FetchType.LAZY)
-@JoinColumn(name = "product_id", nullable = false)
-@JsonBackReference
-private ProductModel product;
-
-@Enumerated(EnumType.STRING)
-@Column(name = "status",nullable = false)
-OrderStatus status;
-
-@Column(name = "total_price",nullable = false)
-Double totalPrice;
-
-@Column(name= "adress", nullable = false)
-String address;
-
-public Order(Long id, LocalDateTime dateOrder, ProductModel product, OrderStatus status, Double totalPrice,
-        String address) {
-    this.id = id;
-    this.dateOrder = dateOrder;
-    this.product = product;
-    this.status = status;
-    this.totalPrice = totalPrice;
-    this.address = address;
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @ManyToOne
+    @JoinColumn(name = "buyer_id", nullable = false)
+    private User buyer;
+    
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    private ProductModel product;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderStatus status;
+    
+    @Column(nullable = false)
+    private BigDecimal totalPrice;
+    
+    @Column(nullable = false)
+    private String address;
+    
+    private LocalDateTime dateOrder;
+    
+    public Order() {}
+    
+    public Order(User buyer, ProductModel product, OrderStatus status, BigDecimal totalPrice, String address) {
+        this.buyer = buyer;
+        this.product = product;
+        this.status = status;
+        this.totalPrice = totalPrice;
+        this.address = address;
+        this.dateOrder = LocalDateTime.now();
+    }
+    
+    public Long getId() {
+        return id;
+    }
+    
+    public User getBuyer() {
+        return buyer;
+    }
+    
+    public ProductModel getProduct() {
+        return product;
+    }
+    
+    public OrderStatus getStatus() {
+        return status;
+    }
+    
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+    
+    public String getAddress() {
+        return address;
+    }
+    
+    public LocalDateTime getDateOrder() {
+        return dateOrder;
+    }
+    
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
+    
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+    
+    public void setAddress(String address) {
+        this.address = address;
+    }
 }
 
-public Long getId() {
-    return id;
-}
 
-public LocalDateTime getDateOrder() {
-    return dateOrder;
-}
-
-public ProductModel getProduct() {
-    return product;
-}
-
-public OrderStatus getStatus() {
-    return status;
-}
-
-public Double getTotalPrice() {
-    return totalPrice;
-}
-
-public String getAddress() {
-    return address;
-}
-
-}

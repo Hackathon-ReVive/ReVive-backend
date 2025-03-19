@@ -1,9 +1,12 @@
 package com.revive.marketplace.user;
 
-import com.revive.marketplace.order.Order;
+import com.revive.marketplace.Order.*;
 import com.revive.marketplace.product.ProductModel;
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
+
 
 @Entity
 @Table(name = "users")
@@ -37,8 +40,8 @@ public class User {
     private List<ProductModel> products;
     
     // Relación con órdenes (un usuario puede tener varias órdenes)
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Order> orders;
+    @OneToMany(mappedBy = "buyer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> orders = new ArrayList<>();
     
     // Constructor vacío requerido por Hibernate
     public User() {
@@ -76,5 +79,3 @@ public class User {
         USER, ADMIN
     }
 }
-
-
