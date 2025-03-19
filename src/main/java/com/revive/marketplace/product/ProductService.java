@@ -19,7 +19,7 @@ public class ProductService {
     }
     
     @Transactional
-    public ProductDto createProduct(ProductRequestDTO requestDTO) {
+    public ProductDTO createProduct(ProductRequestDTO requestDTO) {
         if (requestDTO.getUserId() == null) {
             throw new IllegalArgumentException("El usuario no puede ser nulo");
         }
@@ -48,37 +48,37 @@ public class ProductService {
         System.out.println("Producto creado: " + product.toString());
         
         productRepository.save(product);
-        return new ProductDto(product);
+        return new ProductDTO(product);
     }
     
     
     
-    public ProductDto getProductById(Long id) {
+    public ProductDTO getProductById(Long id) {
         ProductModel product = productRepository.findById(id)
               .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-        return new ProductDto(product);
+        return new ProductDTO(product);
     }
     
-    public List<ProductDto> getAllProducts() {
+    public List<ProductDTO> getAllProducts() {
         return productRepository.findAll().stream()
-              .map(ProductDto::new)
+              .map(ProductDTO::new)
               .collect(Collectors.toList());
     }
     
-    public List<ProductDto> getProductsByCategory(ProductCategory category) {
+    public List<ProductDTO> getProductsByCategory(ProductCategory category) {
         return productRepository.findByCategory(category).stream()
-              .map(ProductDto::new)
+              .map(ProductDTO::new)
               .collect(Collectors.toList());
     }
     
-    public List<ProductDto> getProductsByStatus(ProductStatus status) {
+    public List<ProductDTO> getProductsByStatus(ProductStatus status) {
         return productRepository.findByStatus(status).stream()
-              .map(ProductDto::new)
+              .map(ProductDTO::new)
               .collect(Collectors.toList());
     }
     
     @Transactional
-    public ProductDto updateProduct(Long id, ProductRequestDTO requestDTO, String userEmail) {
+    public ProductDTO updateProduct(Long id, ProductRequestDTO requestDTO, String userEmail) {
         ProductModel product = productRepository.findById(id)
               .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
         
@@ -95,7 +95,7 @@ public class ProductService {
         product.setLiked(requestDTO.isLiked());
         
         productRepository.save(product);
-        return new ProductDto(product);
+        return new ProductDTO(product);
     }
     
     @Transactional

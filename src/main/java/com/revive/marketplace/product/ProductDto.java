@@ -3,7 +3,7 @@ package com.revive.marketplace.product;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class ProductDto {
+public class ProductDTO {
     private Long id;
     private String title;
     private String description;
@@ -16,11 +16,11 @@ public class ProductDto {
     private Long userId;
     
     // 🔥 Constructor vacío (Spring lo necesita para la serialización)
-    public ProductDto() {
+    public ProductDTO() {
     }
     
     // 🔥 Constructor con parámetros
-    public ProductDto(Long id, String title, String description, BigDecimal price, String image,
+    public ProductDTO(Long id, String title, String description, BigDecimal price, String image,
                       ProductCategory category, ProductStatus status, boolean liked,
                       LocalDateTime createdAt, Long userId) {
         this.id = id;
@@ -36,7 +36,7 @@ public class ProductDto {
     }
     
     // 🔥 Constructor para convertir `ProductModel` en `ProductDTO`
-    public ProductDto(ProductModel product) {
+    public ProductDTO(ProductModel product) {
         this.id = product.getId();
         this.title = product.getTitle();
         this.description = product.getDescription();
