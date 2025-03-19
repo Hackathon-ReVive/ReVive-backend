@@ -1,4 +1,4 @@
-package com.revive.marketplace.Order;
+package com.revive.marketplace.order;
 
 public enum OrderStatus {
     PENDING,

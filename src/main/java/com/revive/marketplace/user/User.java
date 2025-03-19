@@ -1,6 +1,7 @@
 package com.revive.marketplace.user;
 
 import com.revive.marketplace.Order.*;
+import com.revive.marketplace.order.Order;
 import com.revive.marketplace.product.ProductModel;
 import jakarta.persistence.*;
 

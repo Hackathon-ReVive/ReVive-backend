@@ -1,6 +1,6 @@
 package com.revive.marketplace.user;
 
-import com.revive.marketplace.Order.Order;
+import com.revive.marketplace.order.Order;
 import com.revive.marketplace.product.ProductModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

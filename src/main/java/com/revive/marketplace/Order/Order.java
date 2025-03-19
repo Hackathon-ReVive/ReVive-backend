@@ -1,4 +1,5 @@
-package com.revive.marketplace.Order;
+package com.revive.marketplace.order;
+
 import com.revive.marketplace.product.ProductModel;
 import com.revive.marketplace.user.User;
 import jakarta.persistence.*;
@@ -85,5 +86,3 @@ public class Order {
         this.address = address;
     }
 }
-
-
