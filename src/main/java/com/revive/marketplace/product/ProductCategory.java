@@ -11,5 +11,5 @@
         HEALTH,
         BEAUTY,
         GARDEN,
-        OTHER;
+        OTHER
     }

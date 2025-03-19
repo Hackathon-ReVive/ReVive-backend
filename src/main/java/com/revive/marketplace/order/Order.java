@@ -55,4 +55,13 @@ public class Order {
     public OrderStatus getStatus() { return status; }
     public Double getTotalPrice() { return totalPrice; }
     public String getAddress() { return address; }
+    
+    public void setId(Long id) { this.id = id; }
+    public void setDateOrder(LocalDateTime dateOrder) { this.dateOrder = dateOrder; }
+    public void setUser(User user) { this.user = user; }
+    public void setProduct(ProductModel product) { this.product = product; }
+    public void setStatus(OrderStatus status) { this.status = status; }
+    public void setTotalPrice(Double totalPrice) { this.totalPrice = totalPrice; }
+    public void setAddress(String address) { this.address = address; }
+    
 }

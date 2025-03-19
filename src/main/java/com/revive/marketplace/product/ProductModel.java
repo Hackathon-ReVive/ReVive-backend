@@ -45,8 +45,8 @@ public class ProductModel {
     public ProductModel() {
     }
     
-    public ProductModel(String title, String description, BigDecimal price, String image, ProductCategory category,
-                        ProductStatus status, boolean liked, User user) {
+    public ProductModel(String title, String description, BigDecimal price, String image,
+                        ProductCategory category, ProductStatus status, boolean liked, User user) {
         this.title = title;
         this.description = description;
         this.price = price;
@@ -57,6 +57,7 @@ public class ProductModel {
         this.user = user;
         this.createdAt = LocalDateTime.now();
     }
+    
     
     // Getters y Setters
     public Long getId() { return id; }
@@ -78,5 +79,21 @@ public class ProductModel {
     public void setCategory(ProductCategory category) { this.category = category; }
     public void setStatus(ProductStatus status) { this.status = status; }
     public void setLiked(boolean liked) { this.liked = liked; }
+    
+    @Override
+    public String toString() {
+        return "ProductModel{" +
+              "id=" + id +
+              ", title='" + title + '\'' +
+              ", description='" + description + '\'' +
+              ", price=" + price +
+              ", image='" + image + '\'' +
+              ", category=" + category +
+              ", status=" + status +
+              ", liked=" + liked +
+              ", createdAt=" + createdAt +
+              ", user=" + (user != null ? user.getId() : "null") +
+              '}';
+    }
     
 }
