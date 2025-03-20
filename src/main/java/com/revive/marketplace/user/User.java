@@ -70,6 +70,16 @@ public class User {
     public User() {
     }
     
+    public User(Long id, String username, String password, String email, String phonenumber, String address, UserRole role) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.phonenumber = phonenumber;
+        this.address = address;
+        this.role = role;
+    }
+    
     // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
