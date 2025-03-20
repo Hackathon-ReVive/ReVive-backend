@@ -11,6 +11,22 @@ import java.time.LocalDateTime;
 @Table(name = "orders")
 public class Order {
     
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setBuyer(User buyer) {
+        this.buyer = buyer;
+    }
+
+    public void setProduct(ProductModel product) {
+        this.product = product;
+    }
+
+    public void setDateOrder(LocalDateTime dateOrder) {
+        this.dateOrder = dateOrder;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -85,4 +101,5 @@ public class Order {
     public void setAddress(String address) {
         this.address = address;
     }
+    
 }

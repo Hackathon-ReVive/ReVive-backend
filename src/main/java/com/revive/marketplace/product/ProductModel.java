@@ -95,6 +95,11 @@ public class ProductModel {
               ", user=" + (user != null ? user.getId() : "null") +
               '}';
     }
+
+    public void setId(long l) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setId'");
+    }
     
 }
 

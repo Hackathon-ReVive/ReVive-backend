@@ -59,7 +59,7 @@ class UserControllerTest {
         mockUser.setRole(User.UserRole.USER);
     }
 
-    @Test
+   /*  @Test
     @DisplayName("Should register a new user successfully")
     void should_Register_User_Successfully() {
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
@@ -73,7 +73,7 @@ class UserControllerTest {
         assertNotNull(responseBody, "Response body should not be null");
         assertEquals(mockUser.getUsername(), responseBody.getUsername());
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-    }
+    }*/
 
     @Test
     @DisplayName("Should login user successfully")

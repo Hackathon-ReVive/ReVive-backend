@@ -28,4 +28,24 @@ public class OrderRequestDTO {
     public String getAddress() {
         return address;
     }
+
+    public void setBuyerId(Long buyerId) {
+        this.buyerId = buyerId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 }

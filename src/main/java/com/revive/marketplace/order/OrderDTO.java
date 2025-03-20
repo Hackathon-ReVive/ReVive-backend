@@ -11,6 +11,8 @@ public class OrderDTO {
     private OrderStatus status;
     private BigDecimal totalPrice;
     private String address;
+
+    public OrderDTO() {}
     
     public OrderDTO(Order order) {
         this.id = order.getId();
