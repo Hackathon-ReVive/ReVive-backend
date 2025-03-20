@@ -1,4 +1,4 @@
-package com.revive.marketplace.auth;
+package com.revive.marketplace.security;
 
 import com.revive.marketplace.user.UserRepository;
 import com.revive.marketplace.user.User;
@@ -9,9 +9,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
     
@@ -21,14 +18,12 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         // Buscar al usuario por email en lugar de por username
-        Optional<User> userOptional = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email);
         
         // Si el usuario no existe, lanzar una excepción
-        if (userOptional.isEmpty()) {
+        if (user == null) {
             throw new UsernameNotFoundException("User Not Found with email: " + email);
         }
-        
-        User user = userOptional.get();
         
         // Convertir el rol a una autoridad para Spring Security
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());

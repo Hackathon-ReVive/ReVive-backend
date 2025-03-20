@@ -1,9 +1,15 @@
 package com.revive.marketplace.user;
 
+import com.revive.marketplace.cart.Cart;
 import com.revive.marketplace.order.Order;
 import com.revive.marketplace.product.ProductModel;
+import com.revive.marketplace.role.Role;
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -25,20 +31,40 @@ public class User {
     @Column(nullable = false)
     private String phonenumber;
     
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String address;
     
+    // Option 1: Keep ManyToMany relationship with external Role entity
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+          name = "user_roles",
+          joinColumns = @JoinColumn(name = "user_id"),
+          inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
+    
+    // Option 2: Use simple enum approach
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
+    private UserRole role = UserRole.USER;
+    
+    // Simple enum directly in User class
+    public enum UserRole {
+        USER, ADMIN, SELLER
+    }
     
     // Relación con productos (un usuario puede tener varios productos)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProductModel> products;
     
     // Relación con órdenes (un usuario puede tener varias órdenes)
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Order> orders;
+    @OneToMany(mappedBy = "buyer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> orders = new ArrayList<>();
+    
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Cart cart;
+    
+    public Cart getCart() { return cart; }
+    public void setCart(Cart cart) { this.cart = cart; }
     
     // Constructor vacío requerido por Hibernate
     public User() {
@@ -63,16 +89,15 @@ public class User {
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
     
-    public Role getRole() { return role; }
-    public void setRole(Role role) { this.role = role; }
+    public UserRole getRole() { return role; }
+    public void setRole(UserRole role) { this.role = role; }
+    
+    public Set<Role> getRoles() { return roles; }
+    public void setRoles(Set<Role> roles) { this.roles = roles; }
     
     public List<ProductModel> getProducts() { return products; }
     public void setProducts(List<ProductModel> products) { this.products = products; }
     
     public List<Order> getOrders() { return orders; }
     public void setOrders(List<Order> orders) { this.orders = orders; }
-    
-    public enum Role {
-        USER, ADMIN
-    }
 }

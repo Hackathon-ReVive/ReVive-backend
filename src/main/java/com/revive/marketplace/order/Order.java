@@ -1,67 +1,88 @@
 package com.revive.marketplace.order;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.revive.marketplace.product.ProductModel;
 import com.revive.marketplace.user.User;
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "orders")
 public class Order {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "date_order", nullable = false)
-    private LocalDateTime dateOrder;
+    @ManyToOne
+    @JoinColumn(name = "buyer_id", nullable = false)
+    private User buyer;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
-    @JsonBackReference
     private ProductModel product;
     
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(nullable = false)
     private OrderStatus status;
     
-    @Column(name = "total_price", nullable = false)
-    private Double totalPrice;
+    @Column(nullable = false)
+    private BigDecimal totalPrice;
     
-    @Column(name = "address", nullable = false)
+    @Column(nullable = false)
     private String address;
     
-    public Order() {
-    }
+    private LocalDateTime dateOrder;
     
-    public Order(LocalDateTime dateOrder, User user, ProductModel product, OrderStatus status, Double totalPrice, String address) {
-        this.dateOrder = dateOrder;
-        this.user = user;
+    public Order() {}
+    
+    public Order(User buyer, ProductModel product, OrderStatus status, BigDecimal totalPrice, String address) {
+        this.buyer = buyer;
         this.product = product;
         this.status = status;
         this.totalPrice = totalPrice;
         this.address = address;
+        this.dateOrder = LocalDateTime.now();
     }
     
-    // Getters y Setters
-    public Long getId() { return id; }
-    public LocalDateTime getDateOrder() { return dateOrder; }
-    public User getUser() { return user; }
-    public ProductModel getProduct() { return product; }
-    public OrderStatus getStatus() { return status; }
-    public Double getTotalPrice() { return totalPrice; }
-    public String getAddress() { return address; }
+    public Long getId() {
+        return id;
+    }
     
-    public void setId(Long id) { this.id = id; }
-    public void setDateOrder(LocalDateTime dateOrder) { this.dateOrder = dateOrder; }
-    public void setUser(User user) { this.user = user; }
-    public void setProduct(ProductModel product) { this.product = product; }
-    public void setStatus(OrderStatus status) { this.status = status; }
-    public void setTotalPrice(Double totalPrice) { this.totalPrice = totalPrice; }
-    public void setAddress(String address) { this.address = address; }
+    public User getBuyer() {
+        return buyer;
+    }
     
+    public ProductModel getProduct() {
+        return product;
+    }
+    
+    public OrderStatus getStatus() {
+        return status;
+    }
+    
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+    
+    public String getAddress() {
+        return address;
+    }
+    
+    public LocalDateTime getDateOrder() {
+        return dateOrder;
+    }
+    
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
+    
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+    
+    public void setAddress(String address) {
+        this.address = address;
+    }
 }

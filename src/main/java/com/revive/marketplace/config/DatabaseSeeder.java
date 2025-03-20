@@ -2,7 +2,6 @@ package com.revive.marketplace.config;
 
 import com.revive.marketplace.user.User;
 import com.revive.marketplace.user.UserRepository;
-import com.revive.marketplace.user.User.Role;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +20,7 @@ public class DatabaseSeeder {
                 admin.setPassword(passwordEncoder.encode("admin123"));
                 admin.setPhonenumber("555-1234");
                 admin.setAddress("Admin Street 1");
-                admin.setRole(Role.ADMIN);
+                admin.setRole(User.UserRole.ADMIN);  // Use User.UserRole enum instead
                 
                 User user = new User();
                 user.setUsername("user");
@@ -29,7 +28,7 @@ public class DatabaseSeeder {
                 user.setPassword(passwordEncoder.encode("user123"));
                 user.setPhonenumber("555-5678");
                 user.setAddress("User Avenue 2");
-                user.setRole(Role.USER);
+                user.setRole(User.UserRole.USER);  // Use User.UserRole enum instead
                 
                 userRepository.save(admin);
                 userRepository.save(user);

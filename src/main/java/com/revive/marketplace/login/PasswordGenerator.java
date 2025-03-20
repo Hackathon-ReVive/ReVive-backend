@@ -1,4 +1,4 @@
-package com.revive.marketplace.auth;
+package com.revive.marketplace.login;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 

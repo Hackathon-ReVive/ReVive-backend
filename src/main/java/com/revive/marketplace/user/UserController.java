@@ -1,5 +1,6 @@
 package com.revive.marketplace.user;
 
+import com.revive.marketplace.login.LoginRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 public class UserController {
     
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userService;
     
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -32,7 +33,7 @@ public class UserController {
         }
         
         if (user.getRole() == null) {
-            user.setRole(User.Role.USER);
+            user.setRole(User.UserRole.USER);  // Updated to use UserRole enum
         }
         
         userService.saveUser(user);
@@ -44,8 +45,6 @@ public class UserController {
         
         return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
     }
-    
-    
     // Login de usuario
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequestDTO loginRequest) {

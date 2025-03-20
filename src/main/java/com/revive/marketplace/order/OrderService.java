@@ -2,12 +2,16 @@ package com.revive.marketplace.order;
 
 import com.revive.marketplace.product.ProductModel;
 import com.revive.marketplace.product.ProductRepository;
+import com.revive.marketplace.product.ProductStatus;
 import com.revive.marketplace.user.User;
 import com.revive.marketplace.user.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -22,41 +26,49 @@ public class OrderService {
         this.productRepository = productRepository;
     }
     
-    // 1. Obtener todas las órdenes
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    public List<OrderDTO> getAllOrders() {
+        return orderRepository.findAll().stream()
+              .map(OrderDTO::new)
+              .collect(Collectors.toList());
     }
     
-    // 2. Obtener una orden por ID
-    public Optional<Order> getOrderById(Long id) {
-        return orderRepository.findById(id);
+    public Optional<OrderDTO> getOrderById(Long id) {
+        return orderRepository.findById(id).map(OrderDTO::new);
     }
     
-    // 3. Crear una nueva orden
-    public Order createOrder(Order order) {
-
-        ProductModel product = productRepository.findById(order.getProduct().getId())
-              .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
+    @Transactional
+    public OrderDTO createOrder(Long buyerId, Long productId, String address) {
+        if (buyerId == null || productId == null || address == null || address.trim().isEmpty()) {
+            throw new IllegalArgumentException("Todos los datos de la orden deben estar completos");
+        }
         
-  
-        order.setProduct(product);
-   
-        return orderRepository.save(order);
+        User buyer = userRepository.findById(buyerId)
+              .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        
+        ProductModel product = productRepository.findById(productId)
+              .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        
+        if (!product.getStatus().equals(ProductStatus.AVAILABLE)) {
+            throw new RuntimeException("El producto no está disponible para la compra");
+        }
+        
+        Order order = new Order(buyer, product, OrderStatus.PENDING, product.getPrice(), address);
+        orderRepository.save(order);
+        return new OrderDTO(order);
     }
     
-    // 4. Actualizar una orden
-    public Optional<Order> updateOrder(Long id, Order updatedOrder) {
+    @Transactional
+    public Optional<OrderDTO> updateOrder(Long id, OrderRequestDTO request) {
         return orderRepository.findById(id).map(existingOrder -> {
-            existingOrder.setDateOrder(updatedOrder.getDateOrder());
-            existingOrder.setProduct(updatedOrder.getProduct());
-            existingOrder.setStatus(updatedOrder.getStatus());
-            existingOrder.setTotalPrice(updatedOrder.getTotalPrice());
-            existingOrder.setAddress(updatedOrder.getAddress());
-            return orderRepository.save(existingOrder);
+            existingOrder.setStatus(request.getStatus());
+            existingOrder.setTotalPrice(new BigDecimal(request.getTotalPrice().toString()));
+            existingOrder.setAddress(request.getAddress());
+            orderRepository.save(existingOrder);
+            return new OrderDTO(existingOrder);
         });
     }
     
-    //  5. Eliminar una orden
+    @Transactional
     public boolean deleteOrder(Long id) {
         if (orderRepository.existsById(id)) {
             orderRepository.deleteById(id);

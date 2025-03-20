@@ -11,49 +11,44 @@ public class OrderController {
     
     private final OrderService orderService;
     
-    // Constructor con inyección de dependencias
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
     
-    //  1. Obtener todas las órdenes
     @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders() {
-        List<Order> orders = orderService.getAllOrders();
-        return ResponseEntity.ok(orders);
+    public ResponseEntity<List<OrderDTO>> getAllOrders() {
+        return ResponseEntity.ok(orderService.getAllOrders());
     }
     
-    // 2. Obtener una orden por ID
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
+    public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long id) {
         return orderService.getOrderById(id)
               .map(ResponseEntity::ok)
               .orElse(ResponseEntity.notFound().build());
     }
     
-    // 3. Crear una nueva orden
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
-        Order newOrder = orderService.createOrder(order);
-        return ResponseEntity.ok(newOrder);
+    public ResponseEntity<?> createOrder(@RequestBody OrderRequestDTO orderRequest) {
+        if (orderRequest.getBuyerId() == null || orderRequest.getProductId() == null || orderRequest.getAddress() == null || orderRequest.getAddress().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Todos los datos de la orden deben estar completos.");
+        }
+        OrderDTO order = orderService.createOrder(orderRequest.getBuyerId(), orderRequest.getProductId(), orderRequest.getAddress());
+        return ResponseEntity.ok(order);
     }
     
-    // 4. Actualizar una orden
+    
     @PutMapping("/{id}")
-    public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody Order updatedOrder) {
-        return orderService.updateOrder(id, updatedOrder)
+    public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @RequestBody OrderRequestDTO request) {
+        return orderService.updateOrder(id, request)
               .map(ResponseEntity::ok)
               .orElse(ResponseEntity.notFound().build());
     }
     
-    // 5. Eliminar una orden
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteOrder(@PathVariable Long id) {
-        boolean deleted = orderService.deleteOrder(id);
-        if (deleted) {
+        if (orderService.deleteOrder(id)) {
             return ResponseEntity.ok("Order deleted successfully");
-        } else {
-            return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.notFound().build();
     }
 }
