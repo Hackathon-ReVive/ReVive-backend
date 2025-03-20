@@ -58,6 +58,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
               )
               .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/users/register", "/api/users/login", "/", "/**").permitAll()
+                    .requestMatchers("/api/auth/me").authenticated()
                     .anyRequest().authenticated()
               );
         

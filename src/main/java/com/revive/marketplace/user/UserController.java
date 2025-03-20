@@ -1,15 +1,19 @@
 package com.revive.marketplace.user;
 
 import com.revive.marketplace.login.LoginRequestDTO;
+import com.revive.marketplace.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -24,6 +28,10 @@ public class UserController {
     
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    private JwtUtil jwtUtil;
+    @Autowired
+    private UserRepository userRepository;
     
     // Registrar un nuevo usuario
     @PostMapping("/register")
@@ -53,18 +61,51 @@ public class UserController {
                   new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
             );
             
-            User user = userService.getUserByEmail(loginRequest.getEmail());
+            User user = userRepository.findByEmail(loginRequest.getEmail());
+            if (user == null) {
+                return ResponseEntity.status(401).body("Invalid credentials");
+            }
             
-            UserDTO userDTO = new UserDTO(
-                  user.getId(), user.getUsername(), user.getEmail(),
-                  user.getPhonenumber(), user.getAddress(), user.getRole().toString()
-            );
+            String token = jwtUtil.generateToken(user);
             
-            return ResponseEntity.ok(userDTO);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);
+            response.put("user", new UserDTO(
+                  user.getId(),
+                  user.getUsername(),
+                  user.getEmail(),
+                  user.getPhonenumber(),
+                  user.getAddress(),
+                  user.getRole().toString()
+            ));
+            
+            return ResponseEntity.ok(response);
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(401).body("Invalid credentials");
         }
     }
+    
+    
+    
+//    @PostMapping("/login")
+//    public ResponseEntity<?> loginUser(@RequestBody LoginRequestDTO loginRequest) {
+//        try {
+//            authenticationManager.authenticate(
+//                  new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+//            );
+//
+//            User user = userService.getUserByEmail(loginRequest.getEmail());
+//
+//            UserDTO userDTO = new UserDTO(
+//                  user.getId(), user.getUsername(), user.getEmail(),
+//                  user.getPhonenumber(), user.getAddress(), user.getRole().toString()
+//            );
+//
+//            return ResponseEntity.ok(userDTO);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+//        }
+//    }
     
     // Obtener un usuario por ID
     @GetMapping("/{id}")

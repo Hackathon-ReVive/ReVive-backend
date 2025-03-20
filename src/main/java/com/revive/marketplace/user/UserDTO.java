@@ -21,6 +21,10 @@ public class UserDTO {
         this.role = role;
     }
     
+    public UserDTO(Long id, String username, User email, String phonenumber, String address, String string) {
+    
+    }
+    
     // Getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
