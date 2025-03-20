@@ -1,3 +1,4 @@
+
 package com.revive.marketplace.user;
 
 public class UserDTO {
