@@ -33,26 +33,70 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
     
-    // Registrar un nuevo usuario
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody User user) {
-        if (!user.getPassword().startsWith("$2a$")) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+        Map<String, String> errors = new HashMap<>();
+        
+        // Validate required fields (removing username and phone validation)
+        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+            errors.put("email", "Email is required");
+        } else {
+            User existingUser = userRepository.findByEmail(user.getEmail());
+            if (existingUser != null) {
+                errors.put("email", "Email is already in use");
+            }
         }
         
-        if (user.getRole() == null) {
-            user.setRole(User.UserRole.USER);  // Updated to use UserRole enum
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            errors.put("password", "Password is required");
         }
         
-        userService.saveUser(user);
+        if (user.getAddress() == null || user.getAddress().trim().isEmpty()) {
+            errors.put("address", "Address is required");
+        }
         
-        UserDTO userDTO = new UserDTO(
-              user.getId(), user.getUsername(), user.getEmail(),
-              user.getPhonenumber(), user.getAddress(), user.getRole().toString()
-        );
+        // Return errors if validation fails
+        if (!errors.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+        }
         
-        return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
+        try {
+            // Set default values for null fields
+            if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+                user.setUsername("User_" + System.currentTimeMillis()); // Generate default username
+            }
+            
+            // Phone can be null now
+            
+            // Encode password if not already encoded
+            if (!user.getPassword().startsWith("$2a$")) {
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
+            
+            // Set default role if not specified
+            if (user.getRole() == null) {
+                user.setRole(User.UserRole.USER);
+            }
+            
+            User savedUser = userService.saveUser(user);
+            
+            UserDTO userDTO = new UserDTO(
+                  savedUser.getId(),
+                  savedUser.getUsername(),
+                  savedUser.getEmail(),
+                  savedUser.getPhonenumber(),
+                  savedUser.getAddress(),
+                  savedUser.getRole().toString()
+            );
+            
+            return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
+        } catch (Exception e) {
+            errors.put("server", "Registration failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errors);
+        }
     }
+    
+    
     // Login de usuario
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequestDTO loginRequest) {
@@ -84,28 +128,6 @@ public class UserController {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
     }
-    
-    
-    
-//    @PostMapping("/login")
-//    public ResponseEntity<?> loginUser(@RequestBody LoginRequestDTO loginRequest) {
-//        try {
-//            authenticationManager.authenticate(
-//                  new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
-//            );
-//
-//            User user = userService.getUserByEmail(loginRequest.getEmail());
-//
-//            UserDTO userDTO = new UserDTO(
-//                  user.getId(), user.getUsername(), user.getEmail(),
-//                  user.getPhonenumber(), user.getAddress(), user.getRole().toString()
-//            );
-//
-//            return ResponseEntity.ok(userDTO);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-//        }
-//    }
     
     // Obtener un usuario por ID
     @GetMapping("/{id}")
