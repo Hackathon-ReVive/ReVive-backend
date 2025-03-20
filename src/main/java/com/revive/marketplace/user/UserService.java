@@ -1,19 +1,18 @@
 package com.revive.marketplace.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.List;
 
-@Service
-public class UserService {
-    
-    @Autowired
-    private UserRepository userRepository;
-    
-    public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-    }
-    
-    public void saveUser(User user) {
-        userRepository.save(user);
-    }
+public interface UserService {
+    User saveUser(UserDTO userDto);
+    User saveUser(User user);
+    User findByEmail(String email);
+    User findUserByEmail(String email);  // Alias for findByEmail
+    User getUserByEmail(String email);   // Alias for findByEmail
+    User findByUsername(String username);
+    User getUserById(Long id);
+    List<User> findAllUsers();
+    List<User> getAllUsers();
+    boolean existsByEmail(String email);
+    boolean existsByUsername(String username);
+    void deleteUserById(Long id);
 }
