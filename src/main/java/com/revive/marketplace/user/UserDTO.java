@@ -9,7 +9,6 @@ public class UserDTO {
     private String address;
     private String role;
 
-    // Constructors
     public UserDTO() {
     }
 
@@ -26,7 +25,6 @@ public class UserDTO {
 
     }
 
-    // Getters and setters
     public Long getId() {
         return id;
     }

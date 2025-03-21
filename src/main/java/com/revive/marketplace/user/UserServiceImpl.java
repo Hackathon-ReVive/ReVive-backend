@@ -24,8 +24,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setPhonenumber(userDto.getPhonenumber());
         user.setAddress(userDto.getAddress());
-        
-        // Handle role based on string or enum
+
         if (userDto.getRole() != null) {
             try {
                 user.setRole(User.UserRole.valueOf(userDto.getRole()));
@@ -38,8 +37,7 @@ public class UserServiceImpl implements UserService {
         
         return userRepository.save(user);
     }
-    
-    // Rest of the methods unchanged
+
     @Override
     public User saveUser(User user) {
         return userRepository.save(user);

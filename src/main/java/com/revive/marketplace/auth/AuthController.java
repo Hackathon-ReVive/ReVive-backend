@@ -1,70 +1,151 @@
 package com.revive.marketplace.auth;
 
+import com.revive.marketplace.login.LoginRequestDTO;
+import com.revive.marketplace.security.JwtUtil;
 import com.revive.marketplace.user.User;
 import com.revive.marketplace.user.UserDTO;
+import com.revive.marketplace.user.UserRepository;
 import com.revive.marketplace.user.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 
-@Controller
+@RestController
+@RequestMapping("/api/auth")
 public class AuthController {
-    
+
     private final UserServiceImpl userService;
-    
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
+    private final UserRepository userRepository;
+
     @Autowired
-    public AuthController(UserServiceImpl userService) {
+    public AuthController(UserServiceImpl userService,
+            PasswordEncoder passwordEncoder,
+            AuthenticationManager authenticationManager,
+            JwtUtil jwtUtil,
+            UserRepository userRepository) {
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
+        this.userRepository = userRepository;
     }
-    
-    // Handler method to handle home page request
-    @GetMapping("/index")
-    public String home() {
-        return "index";
-    }
-    
-    // Handler method to handle user registration form request
-    @GetMapping("/register")
-    public String showRegistrationForm(Model model) {
-        // Create model object to store form data
-        UserDTO userDto = new UserDTO();
-        model.addAttribute("user", userDto);
-        return "register";
-    }
-    
-    // Handler method to handle user registration form submit request
-    @PostMapping("/register/save")
-    public String registration(@Valid @ModelAttribute("user") UserDTO userDto,
-                               BindingResult result,
-                               Model model) {
-        // Check if user already exists
-        User existingUser = userService.findUserByEmail(userDto.getEmail());
-        
-        if (existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()) {
-            result.rejectValue("email", null,
-                  "There is already an account registered with the same email");
+
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+        Map<String, String> errors = new HashMap<>();
+
+        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+            errors.put("email", "Email is required");
+        } else {
+            User existingUser = userRepository.findByEmail(user.getEmail());
+            if (existingUser != null) {
+                errors.put("email", "Email is already in use");
+            }
         }
-        
-        // If there are validation errors, return to the registration form
-        if (result.hasErrors()) {
-            model.addAttribute("user", userDto);
-            return "register";
+
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            errors.put("password", "Password is required");
         }
-        
-        // Save the user and redirect to the registration page with a success message
-        userService.saveUser(userDto);
-        return "redirect:/register?success";
+
+        if (user.getAddress() == null || user.getAddress().trim().isEmpty()) {
+            errors.put("address", "Address is required");
+        }
+
+        if (!errors.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+        }
+
+        try {
+
+            if (!user.getPassword().startsWith("$2a$")) {
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
+
+            if (user.getRole() == null) {
+                user.setRole(User.UserRole.USER);
+            }
+
+            User savedUser = userService.saveUser(user);
+            UserDTO userDTO = new UserDTO(
+                    savedUser.getId(),
+                    savedUser.getUsername(),
+                    savedUser.getEmail(),
+                    savedUser.getPhonenumber(),
+                    savedUser.getAddress(),
+                    savedUser.getRole().toString());
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
+        } catch (Exception e) {
+            errors.put("server", "Registration failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errors);
+        }
     }
-    
-    // Handler method to handle login request
-    @GetMapping("/login")
-    public String login() {
-        return "login";
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequestDTO loginRequest) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            User user = userRepository.findByEmail(loginRequest.getEmail());
+            if (user == null) {
+                return ResponseEntity.status(401).body("Invalid credentials");
+            }
+
+            String token = jwtUtil.generateToken(user);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);
+            response.put("user", new UserDTO(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getPhonenumber(),
+                    user.getAddress(),
+                    user.getRole().toString()));
+
+            return ResponseEntity.ok(response);
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(401).body("Invalid credentials");
+        }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() ||
+                "anonymousUser".equals(authentication.getPrincipal())) {
+            return ResponseEntity.status(401).body("User not authenticated");
+        }
+
+        User user = userRepository.findByEmail(authentication.getName());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        UserDTO userDTO = new UserDTO(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getPhonenumber(),
+                user.getAddress(),
+                user.getRole().toString());
+
+        return ResponseEntity.ok(userDTO);
     }
 }

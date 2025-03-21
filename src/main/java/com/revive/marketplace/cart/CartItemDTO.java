@@ -8,8 +8,7 @@ public class CartItemDTO {
     private double productPrice;
     private Integer quantity;
     private double subtotal;
-    
-    // Getters and setters
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Long getProductId() { return productId; }
