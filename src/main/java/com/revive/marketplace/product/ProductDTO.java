@@ -14,15 +14,13 @@ public class ProductDTO {
     private boolean liked;
     private LocalDateTime createdAt;
     private Long userId;
-    
-    // 🔥 Constructor vacío (Spring lo necesita para la serialización)
+
     public ProductDTO() {
     }
-    
-    // 🔥 Constructor con parámetros
+
     public ProductDTO(Long id, String title, String description, BigDecimal price, String image,
-                      ProductCategory category, ProductStatus status, boolean liked,
-                      LocalDateTime createdAt, Long userId) {
+            ProductCategory category, ProductStatus status, boolean liked,
+            LocalDateTime createdAt, Long userId) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -34,8 +32,7 @@ public class ProductDTO {
         this.createdAt = createdAt;
         this.userId = userId;
     }
-    
-    // 🔥 Constructor para convertir `ProductModel` en `ProductDTO`
+
     public ProductDTO(ProductModel product) {
         this.id = product.getId();
         this.title = product.getTitle();
@@ -48,35 +45,84 @@ public class ProductDTO {
         this.createdAt = product.getCreatedAt();
         this.userId = product.getUser().getId();
     }
-    
-    // 🔥 Getters y Setters (Necesarios para la serialización JSON)
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
-    
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-    
-    public BigDecimal getPrice() { return price; }
-    public void setPrice(BigDecimal price) { this.price = price; }
-    
-    public String getImage() { return image; }
-    public void setImage(String image) { this.image = image; }
-    
-    public ProductCategory getCategory() { return category; }
-    public void setCategory(ProductCategory category) { this.category = category; }
-    
-    public ProductStatus getStatus() { return status; }
-    public void setStatus(ProductStatus status) { this.status = status; }
-    
-    public boolean isLiked() { return liked; }
-    public void setLiked(boolean liked) { this.liked = liked; }
-    
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public ProductCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(ProductCategory category) {
+        this.category = category;
+    }
+
+    public ProductStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ProductStatus status) {
+        this.status = status;
+    }
+
+    public boolean isLiked() {
+        return liked;
+    }
+
+    public void setLiked(boolean liked) {
+        this.liked = liked;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 }

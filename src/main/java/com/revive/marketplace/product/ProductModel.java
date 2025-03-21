@@ -56,10 +56,8 @@ public class ProductModel {
         this.liked = liked;
         this.user = user;
         this.createdAt = LocalDateTime.now();
-    }
-    
-    
-    // Getters y Setters
+    }    
+
     public Long getId() { return id; }
     public String getTitle() { return title; }
     public String getDescription() { return description; }

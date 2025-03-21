@@ -13,14 +13,14 @@ public class DatabaseSeeder {
     @Bean
     CommandLineRunner initDatabase(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            if (userRepository.count() == 0) { // Solo insertar si la BD está vacía
+            if (userRepository.count() == 0) { 
                 User admin = new User();
                 admin.setUsername("admin");
                 admin.setEmail("admin@example.com");
                 admin.setPassword(passwordEncoder.encode("admin123"));
                 admin.setPhonenumber("555-1234");
                 admin.setAddress("Admin Street 1");
-                admin.setRole(User.UserRole.ADMIN);  // Use User.UserRole enum instead
+                admin.setRole(User.UserRole.ADMIN);
                 
                 User user = new User();
                 user.setUsername("user");
@@ -28,7 +28,7 @@ public class DatabaseSeeder {
                 user.setPassword(passwordEncoder.encode("user123"));
                 user.setPhonenumber("555-5678");
                 user.setAddress("User Avenue 2");
-                user.setRole(User.UserRole.USER);  // Use User.UserRole enum instead
+                user.setRole(User.UserRole.USER);
                 
                 userRepository.save(admin);
                 userRepository.save(user);

@@ -20,15 +20,13 @@ public class CartItem {
     
     @Column(nullable = false)
     private Integer quantity = 1;
-    
-    // Constructors, getters, and setters
+
     public CartItem() {}
     public CartItem(ProductModel product, Integer quantity) {
         this.product = product;
         this.quantity = quantity;
     }
-    
-    // Getters and setters
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Cart getCart() { return cart; }
